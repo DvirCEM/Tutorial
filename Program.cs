@@ -15,6 +15,25 @@ class Program
 
     var database = new Database();
 
+    database.Users.Add(new User("Dvir", "abcd"));
+    database.Users.Add(new User("Lia", "abcd"));
+    database.Users.Add(new User("Maya", "abcd"));
+
+    database.Catagories.Add(new Catagory("fruits"));
+    database.Products.Add(new Product("Apple", 1));
+    database.Products.Add(new Product("Banana", 1));
+
+    database.Catagories.Add(new Catagory("Meats"));
+    database.Products.Add(new Product("Steak", 2));
+    database.Products.Add(new Product("Beef", 2));
+
+    database.SaveChanges();
+    // Console.ReadKey();
+
+    // Catagory fruits = database.Catagories.Find(1)!;
+    // database.Catagories.Remove(fruits);
+    // database.SaveChanges();
+
     while (true)
     {
       (var request, var response) = server.WaitForRequest();
@@ -39,7 +58,17 @@ class Program
           /*──────────────────────────────────╮
           │ Handle your custome requests here │
           ╰──────────────────────────────────*/
-          response.SetStatusCode(405);
+          if (request.Path == "getCatagories")
+          {
+            string[] catagoryTitles =
+              database.Catagories.Select(catagory => catagory.Title).ToArray();
+
+            response.Send(catagoryTitles);
+          }
+          else
+          {
+            response.SetStatusCode(405);
+          }
 
           database.SaveChanges();
         }
@@ -60,11 +89,29 @@ class Database() : DbBase("database")
   /*──────────────────────────────╮
   │ Add your database tables here │
   ╰──────────────────────────────*/
+  public DbSet<User> Users { get; set; } = default!;
+  public DbSet<Catagory> Catagories { get; set; } = default!;
+  public DbSet<Product> Products { get; set; } = default!;
 }
 
-class User(string id, string username, string password)
+class User(string username, string password)
 {
-  [Key] public string Id { get; set; } = id;
+  [Key] public int Id { get; set; } = default!;
   public string Username { get; set; } = username;
   public string Password { get; set; } = password;
+}
+
+class Catagory(string title)
+{
+  [Key] public int Id { get; set; } = default!;
+  public string Title { get; set; } = title;
+}
+
+class Product(string name, int catagoryId)
+{
+  [Key] public int Id { get; set; } = default!;
+  public string Name { get; set; } = name;
+
+  public int CatagoryId { get; set; } = catagoryId;
+  [ForeignKey("CatagoryId")] public Catagory Catagory { get; set; } = default!;
 }
