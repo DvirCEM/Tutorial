@@ -15,24 +15,22 @@ class Program
 
     var database = new Database();
 
-    database.Users.Add(new User("Dvir", "abcd"));
-    database.Users.Add(new User("Lia", "abcd"));
-    database.Users.Add(new User("Maya", "abcd"));
+    if (true)
+    {
+      database.Catagories.Add(new Catagory("clothing"));
 
-    database.Catagories.Add(new Catagory("fruits"));
-    database.Products.Add(new Product("Apple", 1));
-    database.Products.Add(new Product("Banana", 1));
+      database.Catagories.Add(new Catagory("fruits"));
+      database.Products.Add(new Product("Apple", 2));
+      database.Products.Add(new Product("Banana", 2));
 
-    database.Catagories.Add(new Catagory("Meats"));
-    database.Products.Add(new Product("Steak", 2));
-    database.Products.Add(new Product("Beef", 2));
+      database.Catagories.Add(new Catagory("Meats"));
+      database.Products.Add(new Product("Steak", 3));
+      database.Products.Add(new Product("Beef", 3));
+      database.SaveChanges();
+      database.Catagories.Remove(database.Catagories.Find(1)!);
+      database.SaveChanges();
+    }
 
-    database.SaveChanges();
-    // Console.ReadKey();
-
-    // Catagory fruits = database.Catagories.Find(1)!;
-    // database.Catagories.Remove(fruits);
-    // database.SaveChanges();
 
     while (true)
     {
@@ -60,12 +58,17 @@ class Program
           ╰──────────────────────────────────*/
           if (request.Path == "getCatagories")
           {
-            string[] catagoryTitles =
+            string[] catagoriesTitles =
               database.Catagories.Select(catagory => catagory.Title).ToArray();
 
-            response.Send(catagoryTitles);
+            int[] catagoriesIds =
+              database.Catagories.Select(catagory => catagory.Id).ToArray();
+
+
+            response.Send((catagoriesIds, catagoriesTitles));
           }
-          if (request.Path == "getCatagoryTitle") {
+          if (request.Path == "getCatagoryTitle")
+          {
             int catagoryId = request.GetBody<int>();
 
             Catagory catagory = database.Catagories.Find(catagoryId)!;
