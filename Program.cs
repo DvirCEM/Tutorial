@@ -65,6 +65,13 @@ class Program
 
             response.Send(catagoryTitles);
           }
+          if (request.Path == "getCatagoryTitle") {
+            int catagoryId = request.GetBody<int>();
+
+            Catagory catagory = database.Catagories.Find(catagoryId)!;
+
+            response.Send(catagory.Title);
+          }
           else
           {
             response.SetStatusCode(405);
